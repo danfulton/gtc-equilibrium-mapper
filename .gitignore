@@ -2,6 +2,7 @@
 *.slo
 *.lo
 *.o
+gtc-equilibrium-mapper
 
 # Compiled Dynamic libraries
 *.so
@@ -11,3 +12,6 @@
 *.lai
 *.la
 *.a
+
+# Text Editor Swap files
+*~
