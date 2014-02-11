@@ -2,11 +2,14 @@
 #include "yaml-cpp/yaml.h"
 #include <H5Cpp.h>
 
-using namespace H5;
-
-int main()
+int main( int argcount, char *argvec[] )
 {
-    //declare YAML nodes to work with input file
+    //declare *default* input file, output file, and length of radial profiles
+    <std::string> inFile = "analytic.yaml";
+    <std::string> outFile = "gtcInputEq.h5";
+    int radialProfileLength = 101;
+
+   //declare YAML nodes to work with input file
     YAML::Node magEq;
     YAML::Node oneDim;
     YAML::Node twoDim;
@@ -14,40 +17,40 @@ int main()
     //declare variables to hold and manipulate intermediate data
     int i; //loop index
     double psi[101] = {0.0};
-    double ycoeff[3] = {0.0};
     double dat[101] = {0.0};
 
     //declare vars to manipulate HDF5 output file
-    H5::H5File outfile( "gtcInputEq.h5", H5F_ACC_TRUNC );
-    hsize_t dim[1] = {101};
+    H5::H5File outfile( outFile, H5F_ACC_TRUNC );
+    hsize_t dim[1] = {radialProfileLength};
     H5::DataSpace datspace1D( 1, dim );
     H5::IntType dattype( H5::PredType::NATIVE_DOUBLE );
-    H5::DataSet datset = outfile.createDataSet( "qProfile", dattype, datspace1D );
+    H5::DataSet datset; 
 
     //read in the YAML eq file
-    magEq = YAML::LoadFile("analytic.yaml");
+    magEq = YAML::LoadFile( inFile );
+
+    //generate radial coords
+    for ( i=0; i<radialProfileLength; i++ )
+        psi[i] = i/(radialProfileLength - 1.0);
 
     //do some parsing
     //first check for 1D and 2D data in the eq file
-    if(magEq["1D profiles"])
+    //if the exist, generate profiles from polynomial coefficients
+    if(magEq["1D profiles"]){
         oneDim = magEq["1D profiles"];
-    if(magEq["2d profiles"])
-        twoDim = magEq["2D profiles"];
-    
-    //generate coords
-    for ( i=0; i<101; i++ )
-        psi[i] = i/100.0;
-
-    //parse 1D profiles
-    if(oneDim["q"]){
-        for ( i=0; i<3; i++ )
-            ycoeff[i] = oneDim["q"][i].as<double>();
-        for ( i=0; i<101; i++ )
-            dat[i] = ycoeff[0] + ycoeff[1]*psi[i] + ycoeff[2]*psi[i]*psi[i];
+        for(YAML::const_iterator iter=oneDim.begin(); iter!=oneDim.end(); ++iter){
+            for( i=0; i<radialProfileLength; i++)
+                dat[i] = iter->second[0].as<double>() 
+                        + iter->second[1].as<double>()*psi[i] 
+                        + iter->second[2].as<double>()*psi[i]*psi[i];
+            datset = outfile.createDataSet( iter->first.as<std::string>(), dattype, datspace1D );
+            datset.write( dat, H5::PredType::NATIVE_DOUBLE );
+        }
     }
-
-    //now write data to HDF5 file
-    datset.write( dat, H5::PredType::NATIVE_DOUBLE );
+    if(magEq["2d profiles"]){
+        twoDim = magEq["2D profiles"];
+        // do some more parsing if we need this part...
+    }
 
     return 0;
 }
