@@ -1,5 +1,22 @@
-% Sample Analytic Magnetic Equilibrium
+% cyclone case analytic equilibrium - ITG
 ---
+scalars:
+    % poloidal flux at wall
+    psiw: 0.0375
+    % on axis quantities
+    itemp0: 1.0
+    ftemp0: 2.0
+    fden0: 0.00001
+
+% radial profiles
 1D profiles:
-    q: [1.0, 2.0, 0.4]
-    
+    q: [0.82, 1.1, 1.0]
+    ze: [1.0, 0.0, 0.0]
+    er: [0.0, 0.0, 0.0]
+    ne: [0.205, 0.3, 0.4]
+    nf: [0.205, 0.3, 0.4]
+    te: [0.415, 0.18, 0.4]
+    ti: [0.415, 0.18, 0.4]
+    tf: [0.415, 0.18, 0.4]
+
+
