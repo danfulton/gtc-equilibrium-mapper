@@ -5,9 +5,9 @@
 int main( int argcount, char *argvec[] )
 {
     //declare *default* input file, output file, and length of radial profiles
-    <std::string> inFile = "analytic.yaml";
-    <std::string> outFile = "gtcInputEq.h5";
-    int radialProfileLength = 101;
+    std::string inFile = "analytic.yaml";
+    std::string outFile = "gtcInputEq.h5";
+    const int radialProfileLength = 101;
 
    //declare YAML nodes to work with input file
     YAML::Node magEq;
@@ -16,12 +16,12 @@ int main( int argcount, char *argvec[] )
 
     //declare variables to hold and manipulate intermediate data
     int i; //loop index
-    double psi[101] = {0.0};
-    double dat[101] = {0.0};
+    double psi[radialProfileLength] = {0.0};
+    double dat[radialProfileLength] = {0.0};
 
     //declare vars to manipulate HDF5 output file
     H5::H5File outfile( outFile, H5F_ACC_TRUNC );
-    hsize_t dim[1] = {radialProfileLength};
+    hsize_t dim[1] = { (unsigned int)radialProfileLength };
     H5::DataSpace datspace1D( 1, dim );
     H5::IntType dattype( H5::PredType::NATIVE_DOUBLE );
     H5::DataSet datset; 
