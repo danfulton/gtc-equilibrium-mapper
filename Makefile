@@ -1,9 +1,8 @@
 gtc-equilibrium-mapper: main.cpp
-	h5c++ -o gtc-equilibrium-mapper main.cpp -lyaml-cpp
-	rm main.o
+	g++ -o gtc-equilibrium-mapper main.cpp -lyaml-cpp -lboost_program_options -lhdf5 -lhdf5_cpp
 
 .PHONY: clean
 
 clean:
-	rm -f main.o gtc-equilibrium-mapper
+	rm -f gtc-equilibrium-mapper
 

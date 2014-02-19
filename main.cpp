@@ -1,13 +1,35 @@
 #include <iostream>
 #include "yaml-cpp/yaml.h"
 #include <H5Cpp.h>
+#include <boost/program_options.hpp>
 
-int main( int argcount, char *argvec[] )
+namespace po = boost::program_options;
+
+int main( int argCount, char *argVec[] )
 {
+
     //declare *default* input file, output file, and length of radial profiles
-    std::string inFile = "analytic.yaml";
-    std::string outFile = "gtcInputEq.h5";
+    std::string inFile;
+    std::string outFile;
     const int radialProfileLength = 101;
+
+    //options for command line input are defined here
+    po::options_description optDesc("Allowed options");
+    optDesc.add_options()
+        ("help","produce help message")
+        ("in",po::value<std::string>(&inFile)->default_value("analytic.yaml"), "input file name")
+        ("out",po::value<std::string>(&outFile)->default_value("gtcInputEq.h5"), "output file name")
+    ;
+    po::variables_map varMap;
+    po::store(po::parse_command_line(argCount, argVec, optDesc), varMap);
+    po::notify(varMap);
+    
+    if (varMap.count("help")) {
+        std::cout << optDesc << "\n";
+        return 1;
+    }
+
+
 
    //declare YAML nodes to work with input file
     YAML::Node magEq;
